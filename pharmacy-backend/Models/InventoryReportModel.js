@@ -972,6 +972,202 @@ class InventoryReportModel {
   /**
    * Get inventory report data based on type
    */
+  //   static async getInventoryReport(filters) {
+  //     try {
+  //       const {
+  //         type = "current",
+  //         category = "all",
+  //         startDate,
+  //         endDate,
+  //       } = filters;
+
+  //       // Select query based on report type
+  //       let query = "";
+  //       let params = [];
+  //       let categoryFilter = "";
+
+  //       // Add category filter if specified
+  //       if (category && category !== "all") {
+  //         categoryFilter = "AND pc.name = ?";
+  //         params.push(category);
+  //       }
+
+  //       // Current inventory report
+  //       if (type === "current") {
+  //         query = `
+  //         SELECT
+  //           p.product_id,
+  //           p.pname,
+  //           p.quantity,
+  //           p.treshold,
+  //           p.price,
+  //           p.type as product_type,
+  //           pc.name AS category_name,
+  //           (p.quantity * p.price) AS total_value
+  //         FROM
+  //           product p
+  //         LEFT JOIN
+  //           product_cato pc ON p.product_cato_id = pc.product_cato_id
+  //         WHERE
+  //           1=1 ${categoryFilter}
+  //         ORDER BY
+  //           p.product_id ASC
+  //       `;
+  //       }
+  //       // Low stock items report
+  //       else if (type === "lowstock") {
+  //         query = `
+  //         SELECT
+  //           p.product_id,
+  //           p.pname,
+  //           p.quantity,
+  //           p.treshold,
+  //           p.price,
+  //           p.type as product_type,
+  //           pc.name AS category_name,
+  //           (p.quantity * p.price) AS total_value,
+  //           s.F_name AS supplier_first_name,
+  //           s.L_name AS supplier_last_name,
+  //           CONCAT(s.F_name, ' ', s.L_name) AS supplier_name
+  //         FROM
+  //           product p
+  //         LEFT JOIN
+  //           product_cato pc ON p.product_cato_id = pc.product_cato_id
+  //         LEFT JOIN
+  //           supplier_suppling_products ssp ON p.product_id = ssp.product_id
+  //         LEFT JOIN
+  //           supplier s ON ssp.sup_id = s.sup_id
+  //         WHERE
+  //           p.quantity <= p.treshold ${categoryFilter}
+  //         ORDER BY
+  //           (p.treshold - p.quantity) DESC
+  //       `;
+  //       }
+  //       // Expiring items report
+  //       else if (type === "expiry") {
+  //         // Current date plus 90 days for expiring soon items
+  //         const today = new Date();
+  //         const ninetyDaysLater = new Date();
+  //         ninetyDaysLater.setDate(today.getDate() + 90);
+
+  //         const todayFormatted = today.toISOString().split("T")[0];
+  //         const ninetyDaysFormatted = ninetyDaysLater.toISOString().split("T")[0];
+
+  //         query = `
+  //        SELECT
+  //     p.product_id,
+  //     p.pname,
+  //     p.quantity,
+  //     p.price,
+  //     sp.expired_date AS exp_date,
+  //     p.type AS product_type,
+  //     pc.name AS category_name,
+  //     (p.quantity * p.price) AS total_value
+  // FROM
+  //     product p
+  // LEFT JOIN
+  //     product_cato pc ON p.product_cato_id = pc.product_cato_id
+  // LEFT JOIN
+  //     supplier_product sp ON p.product_id = sp.product_id
+  // WHERE
+  //     sp.expired_date BETWEEN ? AND ?
+  //     AND p.quantity > 0
+  //     AND (? IS NULL OR pc.name = ?) -- Optional category filter
+  // ORDER BY
+  //     sp.expired_date ASC;
+  //       `;
+  //         params.unshift(todayFormatted, ninetyDaysFormatted);
+  //       }
+  //       // Stock movement report
+  //       else if (type === "movement") {
+  //         if (!startDate || !endDate) {
+  //           throw new Error(
+  //             "Start date and end date are required for movement reports"
+  //           );
+  //         }
+
+  //         // For inventory movement, we need to calculate opening and closing stock
+  //         // This is a more complex query that requires analyzing both customer orders and supplier orders
+  //         query = `
+  //         SELECT
+  //           p.product_id,
+  //           p.pname,
+  //           p.price,
+  //           pc.name AS category_name,
+
+  //           /* Get opening stock at the start date */
+  //           (
+  //             SELECT IFNULL(p.quantity, 0) -
+  //             IFNULL((
+  //               SELECT SUM(cp.quantity)
+  //               FROM customer_product cp
+  //               JOIN cus_oder co ON cp.cus_oder_id = co.cus_oder_id
+  //               WHERE cp.product_id = p.product_id
+  //               AND co.created_at BETWEEN ? AND ?
+  //             ), 0) +
+  //             IFNULL((
+  //               SELECT SUM(sp.quantity)
+  //               FROM supplier_product sp
+  //               JOIN s_oder so ON sp.oder_id = so.oder_id
+  //               WHERE sp.product_id = p.product_id
+  //               AND so.created_at BETWEEN ? AND ?
+  //             ), 0)
+  //           ) AS opening_stock,
+
+  //           /* Stock coming in during the period (from suppliers) */
+  //           IFNULL((
+  //             SELECT SUM(sp.quantity)
+  //             FROM supplier_product sp
+  //             JOIN s_oder so ON sp.oder_id = so.oder_id
+  //             WHERE sp.product_id = p.product_id
+  //             AND so.created_at BETWEEN ? AND ?
+  //           ), 0) AS stock_in,
+
+  //           /* Stock going out during the period (to customers) */
+  //           IFNULL((
+  //             SELECT SUM(cp.quantity)
+  //             FROM customer_product cp
+  //             JOIN cus_oder co ON cp.cus_oder_id = co.cus_oder_id
+  //             WHERE cp.product_id = p.product_id
+  //             AND co.created_at BETWEEN ? AND ?
+  //           ), 0) AS stock_out,
+
+  //           /* Current stock (closing stock) */
+  //           p.quantity AS closing_stock
+
+  //         FROM
+  //           product p
+  //         LEFT JOIN
+  //           product_cato pc ON p.product_cato_id = pc.product_cato_id
+  //         WHERE
+  //           1=1 ${categoryFilter}
+  //         ORDER BY
+  //           p.product_id ASC
+  //       `;
+
+  //         // Add all the date parameters
+  //         params.unshift(startDate, endDate); // For opening stock calculation - customer orders
+  //         params.push(startDate, endDate); // For opening stock calculation - supplier orders
+  //         params.push(startDate, endDate); // For stock in
+  //         params.push(startDate, endDate); // For stock out
+  //       }
+
+  //       // Execute the query to get inventory data
+  //       const [inventoryData] = await db.execute(query, params);
+
+  //       // Calculate summary statistics
+  //       const summary = await this.calculateSummaryStatistics(type, category);
+
+  //       return {
+  //         inventory: inventoryData,
+  //         summary,
+  //       };
+  //     } catch (error) {
+  //       console.error("Error in getInventoryReport:", error);
+  //       throw error;
+  //     }
+  //   }
+
   static async getInventoryReport(filters) {
     try {
       const {
@@ -981,190 +1177,153 @@ class InventoryReportModel {
         endDate,
       } = filters;
 
-      // Select query based on report type
       let query = "";
       let params = [];
       let categoryFilter = "";
 
-      // Add category filter if specified
       if (category && category !== "all") {
         categoryFilter = "AND pc.name = ?";
         params.push(category);
       }
 
-      // Current inventory report
       if (type === "current") {
         query = `
-        SELECT 
-          p.product_id,
-          p.pname,
-          p.quantity,
-          p.treshold,
-          p.price,
-          p.exp_date,
-          p.typr as product_type,
-          pc.name AS category_name,
-          (p.quantity * p.price) AS total_value
-        FROM 
-          product p
-        LEFT JOIN 
-          product_cato pc ON p.product_cato_id = pc.product_cato_id
-        WHERE 
-          1=1 ${categoryFilter}
-        ORDER BY 
-          p.product_id ASC
-      `;
-      }
-      // Low stock items report
-      else if (type === "lowstock") {
+          SELECT 
+            p.product_id,
+            p.pname,
+            p.quantity,
+            p.treshold,
+            p.price,
+            p.type as product_type,
+            pc.name AS category_name,
+            (p.quantity * p.price) AS total_value
+          FROM 
+            product p
+          LEFT JOIN 
+            product_cato pc ON p.product_cato_id = pc.product_cato_id
+          WHERE 
+            1=1 ${categoryFilter}
+          ORDER BY 
+            p.product_id ASC
+        `;
+      } else if (type === "lowstock") {
         query = `
-        SELECT 
-          p.product_id,
-          p.pname,
-          p.quantity,
-          p.treshold,
-          p.price,
-          p.exp_date,
-          p.typr as product_type,
-          pc.name AS category_name,
-          (p.quantity * p.price) AS total_value,
-          s.F_name AS supplier_first_name,
-          s.L_name AS supplier_last_name,
-          CONCAT(s.F_name, ' ', s.L_name) AS supplier_name
-        FROM 
-          product p
-        LEFT JOIN 
-          product_cato pc ON p.product_cato_id = pc.product_cato_id
-        LEFT JOIN 
-          supplier_suppling_products ssp ON p.product_id = ssp.product_id
-        LEFT JOIN 
-          supplier s ON ssp.sup_id = s.sup_id
-        WHERE 
-          p.quantity <= p.treshold ${categoryFilter}
-        ORDER BY 
-          (p.treshold - p.quantity) DESC
-      `;
-      }
-      // Expiring items report
-      else if (type === "expiry") {
-        // Current date plus 90 days for expiring soon items
+          SELECT 
+            p.product_id,
+            p.pname,
+            p.quantity,
+            p.treshold,
+            p.price,
+            p.type as product_type,
+            pc.name AS category_name,
+            (p.quantity * p.price) AS total_value,
+            s.F_name AS supplier_first_name,
+            s.L_name AS supplier_last_name,
+            CONCAT(s.F_name, ' ', s.L_name) AS supplier_name
+          FROM 
+            product p
+          LEFT JOIN 
+            product_cato pc ON p.product_cato_id = pc.product_cato_id
+          LEFT JOIN 
+            supplier_suppling_products ssp ON p.product_id = ssp.product_id
+          LEFT JOIN 
+            supplier s ON ssp.sup_id = s.sup_id
+          WHERE 
+            p.quantity <= p.treshold ${categoryFilter}
+          ORDER BY 
+            (p.treshold - p.quantity) DESC
+        `;
+      } else if (type === "expiry") {
         const today = new Date();
         const ninetyDaysLater = new Date();
         ninetyDaysLater.setDate(today.getDate() + 90);
 
-        const todayFormatted = today.toISOString().split("T")[0];
-        const ninetyDaysFormatted = ninetyDaysLater.toISOString().split("T")[0];
-
         query = `
-        SELECT 
-          p.product_id,
-          p.pname,
-          p.quantity,
-          p.price,
-          p.exp_date,
-          p.typr as product_type,
-          pc.name AS category_name,
-          (p.quantity * p.price) AS total_value
-        FROM 
-          product p
-        LEFT JOIN 
-          product_cato pc ON p.product_cato_id = pc.product_cato_id
-        WHERE 
-          p.exp_date BETWEEN ? AND ? 
-          AND p.quantity > 0
-          ${categoryFilter}
-        ORDER BY 
-          p.exp_date ASC
-      `;
-        params.unshift(todayFormatted, ninetyDaysFormatted);
-      }
-      // Stock movement report
-      else if (type === "movement") {
+          SELECT 
+            p.product_id,
+            p.pname,
+            p.quantity,
+            p.price,
+            p.type as product_type,
+            pc.name AS category_name,
+            (p.quantity * p.price) AS total_value,
+            sp.expired_date AS exp_date,
+            DATEDIFF(sp.expired_date, CURDATE()) AS days_until_expiry
+          FROM 
+            product p
+          LEFT JOIN 
+            product_cato pc ON p.product_cato_id = pc.product_cato_id
+          LEFT JOIN 
+            supplier_product sp ON p.product_id = sp.product_id
+          WHERE 
+            sp.expired_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 90 DAY)
+            AND p.quantity > 0
+            ${categoryFilter}
+          ORDER BY 
+            sp.expired_date ASC
+        `;
+      } else if (type === "movement") {
         if (!startDate || !endDate) {
           throw new Error(
             "Start date and end date are required for movement reports"
           );
         }
 
-        // For inventory movement, we need to calculate opening and closing stock
-        // This is a more complex query that requires analyzing both customer orders and supplier orders
         query = `
-        SELECT 
-          p.product_id,
-          p.pname,
-          p.price,
-          pc.name AS category_name,
-          
-          /* Get opening stock at the start date */
-          (
-            SELECT IFNULL(p.quantity, 0) - 
-            IFNULL((
-              SELECT SUM(cp.quantity)
-              FROM customer_product cp
-              JOIN cus_oder co ON cp.cus_oder_id = co.cus_oder_id
-              WHERE cp.product_id = p.product_id
-              AND co.created_at BETWEEN ? AND ?
-            ), 0) + 
+          SELECT 
+            p.product_id,
+            p.pname,
+            p.price,
+            pc.name AS category_name,
+            (
+              SELECT IFNULL(SUM(initial.quantity), 0)
+              FROM (
+                SELECT quantity FROM product_history 
+                WHERE product_id = p.product_id AND date < ? AND action = 'stock'
+                ORDER BY date DESC LIMIT 1
+              ) AS initial
+            ) AS opening_stock,
             IFNULL((
               SELECT SUM(sp.quantity)
               FROM supplier_product sp
               JOIN s_oder so ON sp.oder_id = so.oder_id
               WHERE sp.product_id = p.product_id
               AND so.created_at BETWEEN ? AND ?
-            ), 0)
-          ) AS opening_stock,
-          
-          /* Stock coming in during the period (from suppliers) */
-          IFNULL((
-            SELECT SUM(sp.quantity)
-            FROM supplier_product sp
-            JOIN s_oder so ON sp.oder_id = so.oder_id
-            WHERE sp.product_id = p.product_id
-            AND so.created_at BETWEEN ? AND ?
-          ), 0) AS stock_in,
-          
-          /* Stock going out during the period (to customers) */
-          IFNULL((
-            SELECT SUM(cp.quantity)
-            FROM customer_product cp
-            JOIN cus_oder co ON cp.cus_oder_id = co.cus_oder_id
-            WHERE cp.product_id = p.product_id
-            AND co.created_at BETWEEN ? AND ?
-          ), 0) AS stock_out,
-          
-          /* Current stock (closing stock) */
-          p.quantity AS closing_stock
-          
-        FROM 
-          product p
-        LEFT JOIN 
-          product_cato pc ON p.product_cato_id = pc.product_cato_id
-        WHERE 
-          1=1 ${categoryFilter}
-        ORDER BY 
-          p.product_id ASC
-      `;
-
-        // Add all the date parameters
-        params.unshift(startDate, endDate); // For opening stock calculation - customer orders
-        params.push(startDate, endDate); // For opening stock calculation - supplier orders
-        params.push(startDate, endDate); // For stock in
-        params.push(startDate, endDate); // For stock out
+            ), 0) AS stock_in,
+            IFNULL((
+              SELECT SUM(cp.quantity)
+              FROM customer_product cp
+              JOIN cus_oder co ON cp.cus_oder_id = co.cus_oder_id
+              WHERE cp.product_id = p.product_id
+              AND co.created_at BETWEEN ? AND ?
+            ), 0) AS stock_out,
+            p.quantity AS closing_stock
+          FROM 
+            product p
+          LEFT JOIN 
+            product_cato pc ON p.product_cato_id = pc.product_cato_id
+          WHERE 
+            1=1 ${categoryFilter}
+          ORDER BY 
+            p.product_id ASC
+        `;
+        params = [startDate, startDate, endDate, startDate, endDate, ...params];
       }
 
-      // Execute the query to get inventory data
       const [inventoryData] = await db.execute(query, params);
-
-      // Calculate summary statistics
       const summary = await this.calculateSummaryStatistics(type, category);
 
       return {
+        success: true,
         inventory: inventoryData,
         summary,
       };
     } catch (error) {
       console.error("Error in getInventoryReport:", error);
-      throw error;
+      return {
+        success: false,
+        message: error.message,
+      };
     }
   }
 
@@ -1185,16 +1344,18 @@ class InventoryReportModel {
       // Query to get summary statistics
       const summaryQuery = `
         SELECT 
-          COUNT(p.product_id) AS total_products,
-          SUM(p.quantity * p.price) AS total_value,
-          SUM(CASE WHEN p.quantity <= p.treshold THEN 1 ELSE 0 END) AS low_stock_items,
-          SUM(CASE WHEN p.exp_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS expiring_soon
-        FROM 
-          product p
-        LEFT JOIN 
-          product_cato pc ON p.product_cato_id = pc.product_cato_id
-        WHERE 
-          1=1 ${categoryFilter}
+  COUNT(p.product_id) AS total_products,
+  SUM(p.quantity * p.price) AS total_value,
+  SUM(CASE WHEN p.quantity <= p.treshold THEN 1 ELSE 0 END) AS low_stock_items,
+  SUM(CASE WHEN sp.expired_date IS NOT NULL AND sp.expired_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS expiring_soon
+FROM 
+  product p
+LEFT JOIN 
+  product_cato pc ON p.product_cato_id = pc.product_cato_id
+LEFT JOIN 
+  supplier_product sp ON p.product_id = sp.product_id
+WHERE 
+  1=1 ${categoryFilter}
       `;
 
       const [summaryResults] = await db.execute(summaryQuery, params);

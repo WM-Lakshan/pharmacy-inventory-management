@@ -104,19 +104,19 @@ const CartPage = () => {
   };
 
   const handleQuantityChange = async (id, quantity) => {
-    // If value is undefined, null, or not a number, return early
-    if (value === undefined || value === null || isNaN(value)) {
+    // If quantity is undefined, null, or not a number, return early
+    if (quantity === undefined || quantity === null || isNaN(quantity)) {
       return;
     }
 
-    // Ensure value is a positive integer
-    const intValue = Math.max(1, Math.floor(Number(value)));
+    // Ensure quantity is a positive integer
+    const intQuantity = Math.max(1, Math.floor(Number(quantity)));
 
     // Find the item
     const item = cartItems.find((item) => item.id === id);
 
     // Validate quantity against stock
-    if (quantity > item.stockCount) {
+    if (intQuantity > item.stockCount) {
       message.error(`Only ${item.stockCount} items available in stock`);
       return;
     }
@@ -137,18 +137,20 @@ const CartPage = () => {
         `/api/cart/update-quantity`,
         {
           cartItemId: id,
-          quantity,
+          quantity: intQuantity,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // This was likely missing
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       // Update local state
       setCartItems(
-        cartItems.map((item) => (item.id === id ? { ...item, quantity } : item))
+        cartItems.map((item) =>
+          item.id === id ? { ...item, quantity: intQuantity } : item
+        )
       );
 
       // Show success message
@@ -165,7 +167,7 @@ const CartPage = () => {
         // For demo purposes, update the local state anyway
         setCartItems(
           cartItems.map((item) =>
-            item.id === id ? { ...item, quantity } : item
+            item.id === id ? { ...item, quantity: intQuantity } : item
           )
         );
       }

@@ -1558,7 +1558,7 @@ const ReportsPage = () => {
           <SalesReportPage />
         </TabPane>
 
-        <TabPane
+        {/* <TabPane
           tab={
             <span>
               <DropboxOutlined />
@@ -1568,7 +1568,7 @@ const ReportsPage = () => {
           key="2"
         >
           <InventoryReportPage />
-        </TabPane>
+        </TabPane> */}
       </Tabs>
     </div>
   );

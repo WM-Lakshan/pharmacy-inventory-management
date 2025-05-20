@@ -401,12 +401,12 @@ const Login = () => {
                     Remember me
                   </label>
                 </div>
-                <Link
+                {/* <Link
                   to="/forgot-password"
                   className="text-sm text-blue-600 hover:underline"
                 >
                   Forgot password?
-                </Link>
+                </Link> */}
               </div>
 
               {/* Sign in button */}

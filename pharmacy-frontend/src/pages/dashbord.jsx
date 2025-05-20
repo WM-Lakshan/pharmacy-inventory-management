@@ -265,7 +265,7 @@ const Dashboard = () => {
       </div>
 
       {/* Sales & Purchase Chart */}
-      <Card
+      {/* <Card
         title="Sales & Purchase"
         className="mb-6 shadow-md"
         extra={
@@ -321,7 +321,7 @@ const Dashboard = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </Card>
+      </Card> */}
 
       {/* Top Products and Status sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
