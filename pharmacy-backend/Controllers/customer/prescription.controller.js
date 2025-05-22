@@ -8,37 +8,74 @@ class CustomerPrescriptionController {
   /**
    * Get products for a prescription
    */
-  static async getPrescriptionProducts(req, res) {
-    try {
-      const prescriptionId = req.params.id;
-      const customerId = req.user.id;
+  // static async getPrescriptionProducts(req, res) {
+  //   try {
+  //     const prescriptionId = req.params.id;
+  //     const customerId = req.user.id;
 
-      if (!customerId) {
-        return res.status(401).json({
-          success: false,
-          message: "Authentication required",
-        });
-      }
+  //     if (!customerId) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         message: "Authentication required",
+  //       });
+  //     }
 
-      const result = await CustomerPrescriptionModel.getPrescriptionProducts(
-        prescriptionId,
-        customerId
-      );
+  //     const result = await CustomerPrescriptionModel.getPrescriptionProducts(
+  //       prescriptionId,
+  //       customerId
+  //     );
 
-      if (!result.success) {
-        return res.status(404).json(result);
-      }
+  //     if (!result.success) {
+  //       return res.status(404).json(result);
+  //     }
 
-      res.status(200).json(result);
-    } catch (error) {
-      console.error("Error in getPrescriptionProducts controller:", error);
-      res.status(500).json({
+  //     res.status(200).json(result);
+  //   } catch (error) {
+  //     console.error("Error in getPrescriptionProducts controller:", error);
+  //     res.status(500).json({
+  //       success: false,
+  //       message: "Failed to fetch prescription products",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
+
+static async getPrescriptionProducts(req, res) {
+  try {
+    const prescriptionId = req.params.id;
+    const customerId = req.user.id;
+
+    if (!customerId) {
+      return res.status(401).json({
         success: false,
-        message: "Failed to fetch prescription products",
-        error: error.message,
+        message: "Authentication required",
       });
     }
+
+    console.log(`Fetching products for prescription ID: ${prescriptionId}, customer ID: ${customerId}`);
+
+    const result = await CustomerPrescriptionModel.getPrescriptionProducts(
+      prescriptionId,
+      customerId
+    );
+
+    if (!result.success) {
+      console.log(`Failed to fetch prescription products: ${result.message}`);
+      return res.status(404).json(result);
+    }
+
+    console.log(`Found ${result.products.length} products for prescription ${prescriptionId}`);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error in getPrescriptionProducts controller:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch prescription products",
+      error: error.message,
+    });
   }
+}
 
   static async getCustomerPrescriptions(req, res) {
     try {

@@ -478,47 +478,89 @@ class CustomerPrescriptionModel {
   // }
 
   // In getPrescriptionProducts method:
+  // static async getPrescriptionProducts(prescriptionId, customerId) {
+  //   try {
+  //     // First check if the customer owns the prescription
+  //     const [prescriptions] = await db.execute(
+  //       `SELECT prescription_id FROM prescription 
+  //      WHERE prescription_id = ? AND customer_id = ?`,
+  //       [prescriptionId, customerId]
+  //     );
+
+  //     if (prescriptions.length === 0) {
+  //       return {
+  //         success: false,
+  //         message:
+  //           "Prescription not found or you don't have permission to view it",
+  //       };
+  //     }
+
+  //     // Get products directly from prescription_product table
+  //     const [products] = await db.execute(
+  //       `SELECT 
+  //       pp.product_id as id,
+  //       p.pname as name,
+  //       pp.quantity,
+  //       p.price,
+  //       (pp.quantity * p.price) as total
+  //      FROM prescription_product pp
+  //      JOIN product p ON pp.product_id = p.product_id
+  //      WHERE pp.prescription_id = ?
+  //      ORDER BY p.pname`,
+  //       [prescriptionId]
+  //     );
+
+  //     return {
+  //       success: true,
+  //       products,
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in getPrescriptionProducts:", error);
+  //     throw error;
+  //   }
+  // }
+
   static async getPrescriptionProducts(prescriptionId, customerId) {
-    try {
-      // First check if the customer owns the prescription
-      const [prescriptions] = await db.execute(
-        `SELECT prescription_id FROM prescription 
+  try {
+    // First check if the customer owns the prescription
+    const [prescriptions] = await db.execute(
+      `SELECT prescription_id FROM prescription 
        WHERE prescription_id = ? AND customer_id = ?`,
-        [prescriptionId, customerId]
-      );
+      [prescriptionId, customerId]
+    );
 
-      if (prescriptions.length === 0) {
-        return {
-          success: false,
-          message:
-            "Prescription not found or you don't have permission to view it",
-        };
-      }
+    if (prescriptions.length === 0) {
+      return {
+        success: false,
+        message: "Prescription not found or you don't have permission to view it",
+      };
+    }
 
-      // Get products directly from prescription_product table
-      const [products] = await db.execute(
-        `SELECT 
-        pp.product_id as id,
-        p.pname as name,
-        pp.quantity,
-        p.price,
-        (pp.quantity * p.price) as total
+    // Get products from prescription_product table with detailed product info
+    const [products] = await db.execute(
+      `SELECT 
+         pp.product_id as id,
+         p.pname as name,
+         pp.quantity,
+         p.price,
+         p.image,
+         (pp.quantity * p.price) as total
        FROM prescription_product pp
        JOIN product p ON pp.product_id = p.product_id
        WHERE pp.prescription_id = ?
        ORDER BY p.pname`,
-        [prescriptionId]
-      );
+      [prescriptionId]
+    );
 
-      return {
-        success: true,
-        products,
-      };
-    } catch (error) {
-      console.error("Error in getPrescriptionProducts:", error);
-      throw error;
-    }
+    return {
+      success: true,
+      products,
+    };
+  } catch (error) {
+    console.error("Error in getPrescriptionProducts:", error);
+    throw error;
   }
+}
 
   /**
    * Get all prescriptions for the logged-in customer

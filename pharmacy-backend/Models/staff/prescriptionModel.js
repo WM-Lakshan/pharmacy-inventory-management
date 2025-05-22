@@ -701,13 +701,15 @@ class PrescriptionModel {
           for (const batch of batches) {
             if (remaining <= 0) break;
 
-            const reduceAmount = Math.min(remaining, batch.Products_remaining);
-            await connection.execute(
-              `UPDATE supplier_product 
-             SET Products_remaining = Products_remaining - ?
-             WHERE sup_id = ? AND product_id = ? AND oder_id = ?`,
-              [reduceAmount, batch.sup_id, batch.product_id, batch.oder_id]
-            );
+           const reduceAmount = Math.min(remaining, batch.Products_remaining || 0);
+if (reduceAmount <= 0) continue; // Skip if nothing to reduce
+
+await connection.execute(
+  `UPDATE supplier_product 
+   SET Products_remaining = Products_remaining - ?
+   WHERE sup_id = ? AND product_id = ? AND oder_id = ?`,
+  [reduceAmount, batch.sup_id, batch.product_id, batch.oder_id]
+);
             remaining -= reduceAmount;
           }
 

@@ -1063,7 +1063,7 @@ const UploadPrescriptionPage = () => {
               status="success"
               icon={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
               title="Prescription Uploaded Successfully!"
-              subTitle="We'll notify you when your order is ready. Your prescription will expire in 48 hours."
+              subTitle="We'll notify you when your order is ready."
               extra={[
                 // <Button
                 //   type="primary"
@@ -1140,24 +1140,28 @@ const UploadPrescriptionPage = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-item">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Telephone number <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    placeholder="Enter your telephone number"
-                    value={formData.telephone}
-                    onChange={(e) =>
-                      handleFormChange("telephone", e.target.value)
-                    }
-                    status={errors.telephone ? "error" : ""}
-                  />
-                  {errors.telephone && (
-                    <div className="text-red-500 text-xs mt-1">
-                      {errors.telephone}
-                    </div>
-                  )}
-                </div>
+               <div className="form-item">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Telephone number <span className="text-red-500">*</span>
+  </label>
+  <Input
+    placeholder="Enter your telephone number"
+    value={formData.telephone}
+    onChange={(e) => {
+      const value = e.target.value;
+      // Only allow numeric values and maximum 10 digits
+      if (value === '' || (/^\d+$/.test(value) && value.length <= 10)) {
+        handleFormChange("telephone", value);
+      }
+    }}
+    status={errors.telephone ? "error" : ""}
+  />
+  {errors.telephone && (
+    <div className="text-red-500 text-xs mt-1">
+      {errors.telephone}
+    </div>
+  )}
+</div>
 
                 <div className="form-item">
                   <label className="block text-sm font-medium text-gray-700 mb-1">

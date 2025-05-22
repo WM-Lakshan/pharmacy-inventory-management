@@ -2082,13 +2082,27 @@ const CheckoutPage = () => {
       }
 
       // Handle different sources
-      if (source === "prescription" && prescriptionId) {
+      // if (source === "prescription" && prescriptionId) {
+      //   await fetchPrescriptionDetails(prescriptionId);
+      // } else if (source === "product" && productId) {
+      //   await fetchProductDetails(productId, initialQuantity);
+      // } else if (source === "cart") {
+      //   await fetchCartItems();
+      // } else {
+      //   message.error("Invalid checkout source");
+      //   navigate(-1);
+      // }
+       if (source === "prescription" && prescriptionId) {
+        console.log(`Fetching prescription details for ID: ${prescriptionId}`);
         await fetchPrescriptionDetails(prescriptionId);
       } else if (source === "product" && productId) {
+        console.log(`Fetching product details for ID: ${productId}`);
         await fetchProductDetails(productId, initialQuantity);
       } else if (source === "cart") {
+        console.log("Fetching cart items");
         await fetchCartItems();
       } else {
+        console.error("Invalid checkout source", { source, prescriptionId, productId });
         message.error("Invalid checkout source");
         navigate(-1);
       }
@@ -2122,6 +2136,7 @@ const CheckoutPage = () => {
       setMockPrescriptionProducts();
     }
   };
+  
 
   const fetchProductDetails = async (id, qty) => {
     try {
@@ -2277,6 +2292,7 @@ const CheckoutPage = () => {
       navigate(-1);
     }
   };
+  
 
   const processPayment = async () => {
     try {
@@ -2910,7 +2926,7 @@ const CheckoutPage = () => {
 
                         <Alert
                           type="info"
-                          message="Inventory will be reduced immediately"
+                          // message="Inventory will be reduced immediately"
                           description="When paying by credit card, inventory is reserved for you immediately."
                           showIcon
                         />
@@ -2920,8 +2936,8 @@ const CheckoutPage = () => {
                     {paymentMethod !== "creditCard" && (
                       <Alert
                         type="warning"
-                        message="Inventory will be reduced at payment time"
-                        description="The products will be reserved for you, but inventory will only be reduced when you pay at the store."
+                        // message="Inventory will be reduced at payment time"
+                        description="The products will be reserved for you."
                         showIcon
                         className="mt-6"
                       />

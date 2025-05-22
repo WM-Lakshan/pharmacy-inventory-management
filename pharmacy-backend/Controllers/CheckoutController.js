@@ -887,6 +887,115 @@ class CheckoutController {
       connection.release();
     }
   }
+//   static async getPrescriptionProducts(req, res) {
+//   try {
+//     const prescriptionId = req.params.id;
+//     const customerId = req.user.id;
+
+//     // Verify prescription belongs to customer
+//     const [prescriptions] = await db.execute(
+//       `SELECT p.prescription_id 
+//        FROM prescription p
+//        WHERE p.prescription_id = ? AND p.customer_id = ?`,
+//       [prescriptionId, customerId]
+//     );
+
+//     if (prescriptions.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Prescription not found",
+//       });
+//     }
+
+//     // Get prescription products
+//     const [products] = await db.execute(
+//       `SELECT pp.product_id, p.pname as name, pp.quantity, p.price, p.image
+//        FROM prescription_product pp
+//        JOIN product p ON pp.product_id = p.product_id
+//        WHERE pp.prescription_id = ?`,
+//       [prescriptionId]
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       products,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching prescription products:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch prescription products",
+//     });
+//   }
+// }
+
+// Add this method to your existing CheckoutController.js
+/**
+ * Get products associated with a prescription
+ */
+static async getPrescriptionProducts(req, res) {
+  try {
+    const prescriptionId = req.params.id;
+    const customerId = req.user?.id;
+
+    console.log(`API: Fetching products for prescription ID: ${prescriptionId}, customer ID: ${customerId}`);
+
+    // Check if prescription exists, even if it belongs to a different customer
+    // (for admin/staff access)
+    const [prescriptions] = await db.execute(
+      `SELECT p.prescription_id, p.customer_id, p.status
+       FROM prescription p
+       WHERE p.prescription_id = ?`,
+      [prescriptionId]
+    );
+
+    if (prescriptions.length === 0) {
+      console.log(`API: Prescription ${prescriptionId} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "Prescription not found",
+      });
+    }
+
+    const prescription = prescriptions[0];
+    
+    // Get prescription products
+    const [products] = await db.execute(
+      `SELECT 
+         pp.product_id, 
+         p.pname as name, 
+         pp.quantity, 
+         p.price, 
+         p.image
+       FROM prescription_product pp
+       JOIN product p ON pp.product_id = p.product_id
+       WHERE pp.prescription_id = ?`,
+      [prescriptionId]
+    );
+    console.log(`API: First product:`, products.pname);
+
+    console.log(`API: Found ${products.length} products for prescription ${prescriptionId}`);
+    
+    if (products.length === 0) {
+      console.log(`API: No products for prescription ${prescriptionId}`);
+    } else {
+      console.log(`API: First product:`, products[0]);
+    }
+
+    res.status(200).json({
+      success: true,
+      products: products,
+      prescriptionStatus: prescription.status
+    });
+  } catch (error) {
+    console.error("API Error fetching prescription products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch prescription products",
+      error: error.message
+    });
+  }
+}
 
   /**
    * Calculate shipping fee

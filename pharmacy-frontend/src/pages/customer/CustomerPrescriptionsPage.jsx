@@ -1631,35 +1631,65 @@ const CustomerPrescriptions = () => {
   };
 
   // Function to fetch prescription products
-  const fetchPrescriptionProducts = async (prescriptionId) => {
-    setLoadingProducts(true);
-    try {
-      const token = localStorage.getItem("token");
+  // const fetchPrescriptionProducts = async (prescriptionId) => {
+  //   setLoadingProducts(true);
+  //   try {
+  //     const token = localStorage.getItem("token");
 
-      const response = await axios.get(
-        `/api/customer-prescriptions/prescriptions/${prescriptionId}/products`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  //     const response = await axios.get(
+  //       `/api/customer-prescriptions/prescriptions/${prescriptionId}/products`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
 
-      if (response.data.success) {
-        setPrescriptionProducts(response.data.products || []);
-      } else {
-        // If API fails, set mock data for demonstration
-        setMockPrescriptionProducts();
+  //     if (response.data.success) {
+  //       setPrescriptionProducts(response.data.products || []);
+  //     } else {
+  //       // If API fails, set mock data for demonstration
+  //       setMockPrescriptionProducts();
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching prescription products:", error);
+  //     // Set mock data for demonstration
+  //     setMockPrescriptionProducts();
+  //   } finally {
+  //     setLoadingProducts(false);
+  //   }
+  // };
+const fetchPrescriptionProducts = async (prescriptionId) => {
+  setLoadingProducts(true);
+  try {
+    const token = localStorage.getItem("token");
+
+    // This endpoint should match the one we defined in our routes
+    const response = await axios.get(
+      `/api/customer-prescriptions/prescriptions/${prescriptionId}/products`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    } catch (error) {
-      console.error("Error fetching prescription products:", error);
-      // Set mock data for demonstration
-      setMockPrescriptionProducts();
-    } finally {
-      setLoadingProducts(false);
-    }
-  };
+    );
 
+    if (response.data.success) {
+      setPrescriptionProducts(response.data.products || []);
+    } else {
+      // If API fails, set mock data for demonstration
+      setMockPrescriptionProducts();
+    }
+  } catch (error) {
+    console.error("Error fetching prescription products:", error);
+    // Set mock data for demonstration
+    setMockPrescriptionProducts();
+  } finally {
+    setLoadingProducts(false);
+  }
+};
+
+  
   // Mock prescription products for testing
   const setMockPrescriptionProducts = () => {
     const mockProducts = [

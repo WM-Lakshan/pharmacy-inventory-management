@@ -553,12 +553,12 @@ class CheckoutModel {
 
     // Update prescription status to Confirmed if paying by card, otherwise keep as Available
     const newStatus = inventoryReduced ? "Confirmed" : "Available";
-    await connection.execute(
-      `UPDATE prescription 
-       SET status = ?
-       WHERE prescription_id = ?`,
-      [newStatus, prescriptionId]
-    );
+  await connection.execute(
+  `UPDATE prescription 
+   SET status = ?, inventory_reduced = ?
+   WHERE prescription_id = ?`,
+  [newStatus, inventoryReduced ? 1 : 0, prescriptionId]
+);
 
     return {
       success: true,
@@ -633,7 +633,7 @@ class CheckoutModel {
         ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         customerId,
-        "Pending", // Initial status
+        inventoryReduced ? "Confirmed" : "Pending",
         total,
         deliveryMethod,
         addressStr, // Always pass a string value, empty if not provided
