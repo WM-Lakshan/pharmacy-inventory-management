@@ -25,60 +25,7 @@ class SalesModel {
     }
   }
 
-  // Get a specific sale by ID with complete details including products
-  // static async getSaleById(saleId) {
-  //   const connection = await db.getConnection();
-  //   try {
-  //     await connection.beginTransaction();
-
-  //     // Get sale details
-  //     const [saleRows] = await connection.execute(
-  //       `SELECT
-  //         co.cus_oder_id as order_id,
-  //         co.prescription_id,
-  //         co.value as totalValue,
-  //         co.customer_id,
-  //         co.pharmacy_staff_id as staff_id,
-  //         DATE_FORMAT(co.created_at, '%d/%m/%y') as time,
-  //         co.oder_status as status
-  //       FROM cus_oder co
-  //       WHERE co.cus_oder_id = ?`,
-  //       [saleId]
-  //     );
-
-  //     if (saleRows.length === 0) {
-  //       await connection.rollback();
-  //       return null;
-  //     }
-
-  //     const sale = saleRows[0];
-
-  //     // Get products associated with the sale
-  //     const [productRows] = await connection.execute(
-  //       `SELECT
-  //         oi.product_id,
-  //         p.pname as product_name,
-  //         oi.quantity,
-  //         oi.price_at_purchase as price,
-  //         (oi.price_at_purchase * oi.quantity) as value
-  //       FROM order_items oi
-  //       JOIN product p ON oi.product_id = p.product_id
-  //       WHERE oi.cus_oder_id = ?`,
-  //       [saleId]
-  //     );
-
-  //     sale.products = productRows || [];
-
-  //     await connection.commit();
-  //     return sale;
-  //   } catch (error) {
-  //     await connection.rollback();
-  //     console.error(`Error fetching sale with ID ${saleId}:`, error);
-  //     throw error;
-  //   } finally {
-  //     if (connection) connection.release();
-  //   }
-  // }
+  
 
   static async getSaleById(saleId) {
     const connection = await db.getConnection();
@@ -130,7 +77,7 @@ class SalesModel {
 
       if (customerProducts.length > 0) {
         console.log(
-          `SalesModel: Found ${customerProducts.length} products in customer_product table`
+          `Found ${customerProducts.length} products in customer_product table`
         );
         productRows = customerProducts;
       } else {

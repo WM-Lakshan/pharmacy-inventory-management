@@ -1,3 +1,6 @@
+///not using 
+
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, AlertTriangle, ShoppingCart } from "lucide-react";
@@ -33,9 +36,9 @@ const InventoryOverview = () => {
     navigate("/products?filter=ordered");
   };
 
-  const handleNotInStockClick = () => {
-    navigate("/products?filter=outofstock");
-  };
+  // const handleNotInStockClick = () => {
+  //   navigate("/products?filter=outofstock");
+  // };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-md mx-auto">
@@ -77,8 +80,8 @@ const InventoryOverview = () => {
               </span>
             </div>
             <div
-              className="flex justify-between items-center cursor-pointer hover:bg-red-100 p-1 rounded"
-              onClick={handleNotInStockClick}
+              className="flex justify-between items-center cursor-pointer  p-1 rounded"
+             onClick={handleNotInStockClick}
             >
               <span className="text-sm text-gray-700">Not in stock</span>
               <span className="text-red-600 font-semibold">

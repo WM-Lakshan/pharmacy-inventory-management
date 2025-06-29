@@ -20,33 +20,6 @@ class SalesController {
     }
   }
 
-  // Get sale by ID
-  // static async getSaleById(req, res) {
-  //   try {
-  //     const { id } = req.params;
-  //     const sale = await SalesModel.getSaleById(id);
-
-  //     if (!sale) {
-  //       return res.status(404).json({
-  //         success: false,
-  //         message: "Sale not found",
-  //       });
-  //     }
-
-  //     res.status(200).json({
-  //       success: true,
-  //       sale,
-  //     });
-  //   } catch (error) {
-  //     console.error(`Error in getSaleById with ID ${req.params.id}:`, error);
-  //     res.status(500).json({
-  //       success: false,
-  //       message: "Failed to fetch sale details",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
-
   static async getSaleById(req, res) {
     try {
       const { id } = req.params;

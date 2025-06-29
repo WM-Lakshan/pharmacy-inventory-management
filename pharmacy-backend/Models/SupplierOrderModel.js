@@ -45,8 +45,8 @@ class SupplierOrderModel {
           so.created_at as order_date,
           SUM(sp.quantity * sp.price) as total_value
         FROM s_oder so
-        JOIN supplier s ON so.sup_id = s.sup_id
-        JOIN supplier_product sp ON so.oder_id = sp.oder_id
+        LEFT JOIN supplier s ON so.sup_id = s.sup_id
+        LEFT JOIN supplier_product sp ON so.oder_id = sp.oder_id
         GROUP BY so.oder_id
         ORDER BY so.created_at DESC
       `);
@@ -95,7 +95,7 @@ class SupplierOrderModel {
           CONCAT(s.F_name, ' ', s.L_name) as supplier_name,
           so.created_at as order_date
         FROM s_oder so
-        JOIN supplier s ON so.sup_id = s.sup_id
+        LEFT JOIN supplier s ON so.sup_id = s.sup_id
         WHERE so.oder_id = ?`,
         [orderId]
       );

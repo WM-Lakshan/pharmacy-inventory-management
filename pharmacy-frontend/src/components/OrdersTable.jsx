@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Button, Spin, Table } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
@@ -16,29 +16,16 @@ const OrdersTable = ({ orders, loading, onView, onAdd }) => {
     },
      {
       title: "Supplier Name",
-      dataIndex: "total_value",
-      key: "total_value",
+      dataIndex: "supplier_name",
+      key: "supplier_name",
     },
-    // {
-    //   title: "Manager ID",
-    //   dataIndex: "manager_id",
-    //   key: "manager_id",
-    // },
-    // {
-    //   title: "Supplier ID",
-    //   dataIndex: "supplier_id",
-    //   key: "supplier_id",
-    // },
+   
     {
       title: "Created Date",
       dataIndex: "order_date",
       key: "order_date",
     },
-    // {
-    //   title: "Expected Delivery",
-    //   dataIndex: "expected_date",
-    //   key: "expected_date",
-    // },
+ 
   ];
 
   return (

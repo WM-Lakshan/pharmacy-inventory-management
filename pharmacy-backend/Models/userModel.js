@@ -1,479 +1,4 @@
-// // models/userModel.js
-// const { db } = require("../db");
-// const bcrypt = require("bcrypt");
 
-// class UserModel {
-//   /**
-//    * Get user profile by ID and role
-//    * @param {number} userId - User ID
-//    * @param {string} role - User role (customer, staff, manager, supplier)
-//    * @returns {Promise<Object>} User profile data
-//    */
-//   static async getUserProfile(userId, role) {
-//     try {
-//       let table, idField, userData;
-
-//       // Determine which table to query based on role
-//       switch (role) {
-//         case "customer":
-//           table = "customer";
-//           idField = "customer_id";
-//           break;
-//         case "staff":
-//           table = "pharmacy_staff";
-//           idField = "pharmacy_staff_id";
-//           break;
-//         case "manager":
-//           table = "manager";
-//           idField = "manager_id";
-//           break;
-//         case "supplier":
-//           table = "supplier";
-//           idField = "sup_id";
-//           break;
-//         default:
-//           throw new Error("Invalid user role");
-//       }
-
-//       // Query user data from appropriate table
-//       const [userRows] = await db.execute(
-//         `SELECT * FROM ${table} WHERE ${idField} = ?`,
-//         [userId]
-//       );
-
-//       if (userRows.length === 0) {
-//         return null;
-//       }
-
-//       userData = userRows[0];
-
-//       // Format data according to role
-//       let formattedUser = {};
-
-//       if (role === "customer") {
-//         // Get phone number from cusnumber table
-//         const [phoneRows] = await db.execute(
-//           "SELECT number FROM cusnumber WHERE customer_id = ? LIMIT 1",
-//           [userId]
-//         );
-
-//         formattedUser = {
-//           id: userData.customer_id,
-//           name: userData.name,
-//           email: userData.email,
-//           address: userData.address || "",
-//           phone: phoneRows.length > 0 ? phoneRows[0].number : "",
-//           image: userData.image || null,
-//           role: "customer",
-//         };
-//       } else if (role === "staff") {
-//         // Get phone number from pharmacy_staff_tel table
-//         const [phoneRows] = await db.execute(
-//           "SELECT number FROM pharmacy_staff_tel WHERE pharmacy_staff_id = ? LIMIT 1",
-//           [userId]
-//         );
-
-//         formattedUser = {
-//           id: userData.pharmacy_staff_id,
-//           name: `${userData.F_name} ${userData.L_name}`,
-//           firstName: userData.F_name,
-//           lastName: userData.L_name,
-//           email: userData.email || "",
-//           address: userData.address || "",
-//           phone: phoneRows.length > 0 ? phoneRows[0].number : "",
-//           image: userData.image || null,
-//           role: "staff",
-//         };
-//       } else if (role === "manager") {
-//         // Get phone number from m_tel table
-//         const [phoneRows] = await db.execute(
-//           "SELECT number FROM m_tel WHERE manager_id = ? LIMIT 1",
-//           [userId]
-//         );
-
-//         formattedUser = {
-//           id: userData.manager_id,
-//           name: `${userData.F_name} ${userData.L_name}`,
-//           firstName: userData.F_name,
-//           lastName: userData.L_name,
-//           email: userData.email || "",
-//           address: userData.address || "",
-//           phone: phoneRows.length > 0 ? phoneRows[0].number : "",
-//           image: userData.image || null,
-//           role: "manager",
-//         };
-//       } else if (role === "supplier") {
-//         // Get phone number from s_tel table
-//         const [phoneRows] = await db.execute(
-//           "SELECT number FROM s_tel WHERE sup_id = ? LIMIT 1",
-//           [userId]
-//         );
-
-//         formattedUser = {
-//           id: userData.sup_id,
-//           name: `${userData.F_name} ${userData.L_name}`,
-//           firstName: userData.F_name,
-//           lastName: userData.L_name,
-//           email: userData.email || "",
-//           address: userData.address || "",
-//           phone: phoneRows.length > 0 ? phoneRows[0].number : "",
-//           image: userData.image || null,
-//           type: userData.type || "",
-//           role: "supplier",
-//         };
-//       }
-
-//       return formattedUser;
-//     } catch (error) {
-//       console.error("Error in getUserProfile:", error);
-//       throw error;
-//     }
-//   }
-
-//   /**
-//    * Update user profile
-//    * @param {number} userId - User ID
-//    * @param {string} role - User role
-//    * @param {Object} userData - User data to update
-//    * @returns {Promise<Object>} Result object
-//    */
-//   static async updateUserProfile(userId, role, userData) {
-//     const connection = await db.getConnection();
-
-//     try {
-//       await connection.beginTransaction();
-
-//       let table, idField, updateQuery, updateParams;
-
-//       switch (role) {
-//         case "customer":
-//           table = "customer";
-//           idField = "customer_id";
-
-//           // Update customer table
-//           updateQuery =
-//             "UPDATE customer SET name = ?, address = ? WHERE customer_id = ?";
-//           updateParams = [userData.name, userData.address, userId];
-
-//           await connection.execute(updateQuery, updateParams);
-
-//           // Update phone number if provided
-//           if (userData.phone) {
-//             // Check if phone number exists
-//             const [existingPhone] = await connection.execute(
-//               "SELECT number FROM cusnumber WHERE customer_id = ?",
-//               [userId]
-//             );
-
-//             if (existingPhone.length > 0) {
-//               // Update existing phone
-//               await connection.execute(
-//                 "UPDATE cusnumber SET number = ? WHERE customer_id = ?",
-//                 [userData.phone, userId]
-//               );
-//             } else {
-//               // Insert new phone
-//               await connection.execute(
-//                 "INSERT INTO cusnumber (customer_id, number) VALUES (?, ?)",
-//                 [userId, userData.phone]
-//               );
-//             }
-//           }
-//           break;
-
-//         case "staff":
-//           table = "pharmacy_staff";
-//           idField = "pharmacy_staff_id";
-
-//           // Split name into first and last name
-//           let staffFirstName =
-//             userData.firstName || userData.name.split(" ")[0];
-//           let staffLastName =
-//             userData.lastName || userData.name.split(" ").slice(1).join(" ");
-
-//           // Update staff table
-//           updateQuery =
-//             "UPDATE pharmacy_staff SET F_name = ?, L_name = ?, address = ? WHERE pharmacy_staff_id = ?";
-//           updateParams = [
-//             staffFirstName,
-//             staffLastName,
-//             userData.address,
-//             userId,
-//           ];
-
-//           await connection.execute(updateQuery, updateParams);
-
-//           // Update phone number if provided
-//           if (userData.phone) {
-//             // Check if phone number exists
-//             const [existingPhone] = await connection.execute(
-//               "SELECT number FROM pharmacy_staff_tel WHERE pharmacy_staff_id = ?",
-//               [userId]
-//             );
-
-//             if (existingPhone.length > 0) {
-//               // Update existing phone
-//               await connection.execute(
-//                 "UPDATE pharmacy_staff_tel SET number = ? WHERE pharmacy_staff_id = ?",
-//                 [userData.phone, userId]
-//               );
-//             } else {
-//               // Insert new phone
-//               await connection.execute(
-//                 "INSERT INTO pharmacy_staff_tel (pharmacy_staff_id, number) VALUES (?, ?)",
-//                 [userId, userData.phone]
-//               );
-//             }
-//           }
-//           break;
-
-//         case "manager":
-//           table = "manager";
-//           idField = "manager_id";
-
-//           // Split name into first and last name
-//           let managerFirstName =
-//             userData.firstName || userData.name.split(" ")[0];
-//           let managerLastName =
-//             userData.lastName || userData.name.split(" ").slice(1).join(" ");
-
-//           // Update manager table
-//           updateQuery =
-//             "UPDATE manager SET F_name = ?, L_name = ?, address = ? WHERE manager_id = ?";
-//           updateParams = [
-//             managerFirstName,
-//             managerLastName,
-//             userData.address,
-//             userId,
-//           ];
-
-//           await connection.execute(updateQuery, updateParams);
-
-//           // Update phone number if provided
-//           if (userData.phone) {
-//             // Check if phone number exists
-//             const [existingPhone] = await connection.execute(
-//               "SELECT number FROM m_tel WHERE manager_id = ?",
-//               [userId]
-//             );
-
-//             if (existingPhone.length > 0) {
-//               // Update existing phone
-//               await connection.execute(
-//                 "UPDATE m_tel SET number = ? WHERE manager_id = ?",
-//                 [userData.phone, userId]
-//               );
-//             } else {
-//               // Insert new phone
-//               await connection.execute(
-//                 "INSERT INTO m_tel (manager_id, number) VALUES (?, ?)",
-//                 [userId, userData.phone]
-//               );
-//             }
-//           }
-//           break;
-
-//         case "supplier":
-//           table = "supplier";
-//           idField = "sup_id";
-
-//           // Split name into first and last name
-//           let supplierFirstName =
-//             userData.firstName || userData.name.split(" ")[0];
-//           let supplierLastName =
-//             userData.lastName || userData.name.split(" ").slice(1).join(" ");
-
-//           // Update supplier table
-//           updateQuery =
-//             "UPDATE supplier SET F_name = ?, L_name = ?, address = ? WHERE sup_id = ?";
-//           updateParams = [
-//             supplierFirstName,
-//             supplierLastName,
-//             userData.address,
-//             userId,
-//           ];
-
-//           await connection.execute(updateQuery, updateParams);
-
-//           // Update phone number if provided
-//           if (userData.phone) {
-//             // Check if phone number exists
-//             const [existingPhone] = await connection.execute(
-//               "SELECT number FROM s_tel WHERE sup_id = ?",
-//               [userId]
-//             );
-
-//             if (existingPhone.length > 0) {
-//               // Update existing phone
-//               await connection.execute(
-//                 "UPDATE s_tel SET number = ? WHERE sup_id = ?",
-//                 [userData.phone, userId]
-//               );
-//             } else {
-//               // Insert new phone
-//               await connection.execute(
-//                 "INSERT INTO s_tel (sup_id, number) VALUES (?, ?)",
-//                 [userId, userData.phone]
-//               );
-//             }
-//           }
-//           break;
-
-//         default:
-//           throw new Error("Invalid user role");
-//       }
-
-//       await connection.commit();
-
-//       // Get updated user profile
-//       const updatedUser = await this.getUserProfile(userId, role);
-
-//       return {
-//         success: true,
-//         message: "Profile updated successfully",
-//         user: updatedUser,
-//       };
-//     } catch (error) {
-//       await connection.rollback();
-//       console.error("Error in updateUserProfile:", error);
-//       throw error;
-//     } finally {
-//       connection.release();
-//     }
-//   }
-
-//   /**
-//    * Change user password
-//    * @param {number} userId - User ID
-//    * @param {string} role - User role
-//    * @param {string} currentPassword - Current password
-//    * @param {string} newPassword - New password
-//    * @returns {Promise<Object>} Result object
-//    */
-//   static async changePassword(userId, role, currentPassword, newPassword) {
-//     try {
-//       let table, idField;
-
-//       // Determine which table to query based on role
-//       switch (role) {
-//         case "customer":
-//           table = "customer";
-//           idField = "customer_id";
-//           break;
-//         case "staff":
-//           table = "pharmacy_staff";
-//           idField = "pharmacy_staff_id";
-//           break;
-//         case "manager":
-//           table = "manager";
-//           idField = "manager_id";
-//           break;
-//         case "supplier":
-//           table = "supplier";
-//           idField = "sup_id";
-//           break;
-//         default:
-//           throw new Error("Invalid user role");
-//       }
-
-//       // Get current password hash
-//       const [userRows] = await db.execute(
-//         `SELECT password FROM ${table} WHERE ${idField} = ?`,
-//         [userId]
-//       );
-
-//       if (userRows.length === 0) {
-//         return {
-//           success: false,
-//           message: "User not found",
-//         };
-//       }
-
-//       // Verify current password
-//       const isPasswordValid = await bcrypt.compare(
-//         currentPassword,
-//         userRows[0].password
-//       );
-
-//       if (!isPasswordValid) {
-//         return {
-//           success: false,
-//           message: "Current password is incorrect",
-//         };
-//       }
-
-//       // Hash new password
-//       const saltRounds = 10;
-//       const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-//       // Update password
-//       await db.execute(
-//         `UPDATE ${table} SET password = ? WHERE ${idField} = ?`,
-//         [hashedPassword, userId]
-//       );
-
-//       return {
-//         success: true,
-//         message: "Password changed successfully",
-//       };
-//     } catch (error) {
-//       console.error("Error in changePassword:", error);
-//       throw error;
-//     }
-//   }
-
-//   /**
-//    * Update user profile image
-//    * @param {number} userId - User ID
-//    * @param {string} role - User role
-//    * @param {string} imageUrl - Image URL/path
-//    * @returns {Promise<Object>} Result object
-//    */
-//   static async updateProfileImage(userId, role, imageUrl) {
-//     try {
-//       let table, idField;
-
-//       // Determine which table to update based on role
-//       switch (role) {
-//         case "customer":
-//           table = "customer";
-//           idField = "customer_id";
-//           break;
-//         case "staff":
-//           table = "pharmacy_staff";
-//           idField = "pharmacy_staff_id";
-//           break;
-//         case "manager":
-//           table = "manager";
-//           idField = "manager_id";
-//           break;
-//         case "supplier":
-//           table = "supplier";
-//           idField = "sup_id";
-//           break;
-//         default:
-//           throw new Error("Invalid user role");
-//       }
-
-//       // Update image
-//       await db.execute(`UPDATE ${table} SET image = ? WHERE ${idField} = ?`, [
-//         imageUrl,
-//         userId,
-//       ]);
-
-//       return {
-//         success: true,
-//         message: "Profile image updated successfully",
-//         imageUrl,
-//       };
-//     } catch (error) {
-//       console.error("Error in updateProfileImage:", error);
-//       throw error;
-//     }
-//   }
-// }
-
-// module.exports = UserModel;
 const { db } = require("../db");
 const bcrypt = require("bcrypt");
 const {
@@ -509,11 +34,7 @@ class UserModel {
           idField = "manager_id";
           nameFields = "CONCAT(F_name, ' ', L_name) AS fullName";
           break;
-        case "supplier":
-          table = "supplier";
-          idField = "sup_id";
-          nameFields = "CONCAT(F_name, ' ', L_name) AS fullName";
-          break;
+        
         default:
           throw new Error("Invalid user role");
       }
@@ -548,10 +69,8 @@ class UserModel {
       } else if (role === "manager") {
         phoneNumberQuery = "SELECT number FROM m_tel WHERE manager_id = ?";
         phoneNumberField = "manager_id";
-      } else if (role === "supplier") {
-        phoneNumberQuery = "SELECT number FROM s_tel WHERE sup_id = ?";
-        phoneNumberField = "sup_id";
-      }
+      } 
+   
 
       const [phoneNumbers] = await db.execute(phoneNumberQuery, [userId]);
 
@@ -581,7 +100,7 @@ class UserModel {
         { name: "customer", idField: "customer_id" },
         { name: "pharmacy_staff", idField: "pharmacy_staff_id" },
         { name: "manager", idField: "manager_id" },
-        { name: "supplier", idField: "sup_id" },
+        
       ];
 
       for (const table of tables) {
@@ -627,20 +146,14 @@ class UserModel {
         return "pharmacy_staff";
       case "manager":
         return "manager";
-      case "supplier":
-        return "supplier";
       default:
         throw new Error("Invalid user role");
     }
   }
 
-  /**
-   * Update user profile
-   * @param {number} userId - User ID
-   * @param {string} role - User role
-   * @param {Object} userData - User data to update
-   * @returns {Promise<Object>} Result object
-   */
+
+  //userId - User ID , role - User role , userData - User data to update
+  
   static async updateUserProfile(userId, role, userData) {
     const connection = await db.getConnection();
     try {
@@ -661,10 +174,6 @@ class UserModel {
           table = "manager";
           idField = "manager_id";
           break;
-        case "supplier":
-          table = "supplier";
-          idField = "sup_id";
-          break;
         default:
           throw new Error("Invalid user role");
       }
@@ -681,7 +190,7 @@ class UserModel {
           [userData.name, userData.email, userData.address, userId]
         );
       } else {
-        // For manager, staff, and supplier, name is split into F_name and L_name
+        // For manager, staff, name is split into F_name and L_name
         const names = userData.name.split(" ");
         const firstName = names[0];
         const lastName = names.slice(1).join(" ");
@@ -709,10 +218,7 @@ class UserModel {
         } else if (role === "manager") {
           phoneTable = "m_tel";
           phoneField = "manager_id";
-        } else if (role === "supplier") {
-          phoneTable = "s_tel";
-          phoneField = "sup_id";
-        }
+        } 
 
         // Check if phone number already exists
         const [existingPhones] = await connection.execute(
@@ -773,10 +279,6 @@ class UserModel {
         case "manager":
           table = "manager";
           idField = "manager_id";
-          break;
-        case "supplier":
-          table = "supplier";
-          idField = "sup_id";
           break;
         default:
           throw new Error("Invalid user role");
@@ -847,10 +349,7 @@ class UserModel {
           table = "manager";
           idField = "manager_id";
           break;
-        case "supplier":
-          table = "supplier";
-          idField = "sup_id";
-          break;
+        
         default:
           throw new Error("Invalid user role");
       }
