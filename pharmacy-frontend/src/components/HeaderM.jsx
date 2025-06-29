@@ -493,9 +493,9 @@ const HeaderM = () => {
 
       if (!userId || !userType) return;
 
-      const response = await axios.get("/api/notifications/unread-count", {
-        params: { userId, userType },
-      });
+      // const response = await axios.get("/api/notifications/unread-count", {
+      //   params: { userId, userType },
+      // });
 
       setUnreadCount(response.data.count || 0);
     } catch (error) {
@@ -526,7 +526,7 @@ const HeaderM = () => {
         onSubmit={handleSearch}
         className="flex items-center flex-grow max-w-xl"
       >
-        <div className="relative w-full group">
+        {/* <div className="relative w-full group">
           <input
             type="text"
             placeholder="Search product, supplier, order"
@@ -535,7 +535,7 @@ const HeaderM = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 group-hover:border-blue-400 group-hover:shadow-sm"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
-        </div>
+        </div> */}
       </form>
 
       {/* Right Side Icons */}
@@ -550,7 +550,7 @@ const HeaderM = () => {
             <Bell className="w-5 h-5" />
 
             {/* Notification Badge - Only shown when unread notifications exist */}
-            {unreadCount > 0 && (
+            {/* {unreadCount > 0 && (
               <span className="absolute top-0 right-0 flex items-center justify-center">
                 {unreadCount > 9 ? (
                   <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-xs font-bold rounded-full">
@@ -562,7 +562,7 @@ const HeaderM = () => {
                   </span>
                 )}
               </span>
-            )}
+            )} */}
           </button>
         </div>
 

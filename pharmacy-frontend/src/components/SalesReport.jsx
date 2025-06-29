@@ -1623,7 +1623,7 @@ const SalesReportPage = () => {
 
         <div className="flex flex-wrap gap-4 mb-6">
           <Form layout="inline">
-            <Form.Item label="Report Type">
+            {/* <Form.Item label="Report Type">
               <Select
                 value={reportType}
                 onChange={handleReportTypeChange}
@@ -1634,7 +1634,7 @@ const SalesReportPage = () => {
                 <Option value="monthly">Monthly</Option>
                 <Option value="yearly">Yearly</Option>
               </Select>
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item label="Date Range">
               <RangePicker onChange={handleDateRangeChange} value={dateRange} />

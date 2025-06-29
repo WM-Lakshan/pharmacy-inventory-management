@@ -207,7 +207,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card title="Overview" className="shadow-md">
           <div className="grid grid-cols-3 gap-4">
-            <div className="flex flex-col items-center">
+            {/* <div className="flex flex-col items-center">
               <div className="bg-blue-100 p-3 rounded-full mb-2">
                 <BarChartOutlined className="text-blue-500 text-xl" />
               </div>
@@ -215,7 +215,7 @@ const Dashboard = () => {
                 Rs.{overview.totalAmount}
               </Text>
               <Text className="text-gray-500">Sales</Text>
-            </div>
+            </div> */}
 
             <div className="flex flex-col items-center">
               <div className="bg-green-100 p-3 rounded-full mb-2">
@@ -329,11 +329,11 @@ const Dashboard = () => {
         <Card
           title="Top Selling Stock"
           className="shadow-md"
-          extra={
-            <a href="/products" className="text-blue-500">
-              See All
-            </a>
-          }
+          // extra={
+          //   <a href="/products" className="text-blue-500">
+          //     See All
+          //   </a>
+          // }
         >
           <Table
             columns={topSellingColumns}

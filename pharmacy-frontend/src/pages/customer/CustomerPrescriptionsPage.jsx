@@ -1734,9 +1734,9 @@ const fetchPrescriptionProducts = async (prescriptionId) => {
     // Navigate to the checkout page with prescription details
     navigate("/checkout", {
       state: {
-        prescriptionId,
-        comingFrom: "prescription",
-        originalDeliveryMethod: prescription.delivery_method || "Order Pickup",
+        source: "prescription", 
+      prescriptionId: prescriptionId,
+      deliveryMethod: "Order Pickup" 
       },
     });
   };

@@ -14,11 +14,16 @@ const OrdersTable = ({ orders, loading, onView, onAdd }) => {
       dataIndex: "total_value",
       key: "total_value",
     },
-    {
-      title: "Manager ID",
-      dataIndex: "manager_id",
-      key: "manager_id",
+     {
+      title: "Supplier Name",
+      dataIndex: "total_value",
+      key: "total_value",
     },
+    // {
+    //   title: "Manager ID",
+    //   dataIndex: "manager_id",
+    //   key: "manager_id",
+    // },
     // {
     //   title: "Supplier ID",
     //   dataIndex: "supplier_id",

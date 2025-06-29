@@ -380,11 +380,11 @@ const CartPage = () => {
 
             <div className="mt-8 flex flex-col md:flex-row justify-between">
               <div className="md:w-1/3 mb-6 md:mb-0">
-                <textarea
+                {/* <textarea
                   className="w-full p-3 border border-gray-300 rounded"
                   placeholder="Special instructions for your order (optional)"
                   rows={4}
-                />
+                /> */}
               </div>
 
               <div className="md:w-1/2 flex flex-col">
