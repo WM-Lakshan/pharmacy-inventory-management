@@ -99,48 +99,7 @@ class LandingModel {
     }
   }
 
-  // static async uploadPrescription(customerId, data) {
-  //   try {
-  //     const { deliveryMethod, note, filePath, expiryDate } = data;
-
-  //     // Default expiry date to 48 hours from now if not provided
-  //     const expiry =
-  //       expiryDate ||
-  //       (() => {
-  //         const date = new Date();
-  //         date.setHours(date.getHours() + 48);
-  //         return date;
-  //       })();
-
-  //     // Insert prescription record with expiry date
-  //     const [result] = await db.execute(
-  //       `
-  //       INSERT INTO prescription (
-  //         customer_id,
-  //         pharmacy_staff_id,
-  //         status,
-  //         delivery_method,
-  //         note,
-  //         file_path,
-  //         expiry_date
-  //       )
-  //       VALUES (?, NULL, 'Pending', ?, ?, ?, ?)
-  //     `,
-  //       [customerId, deliveryMethod, note || null, filePath, expiry]
-  //     );
-
-  //     return {
-  //       id: result.insertId,
-  //       success: true,
-  //       expiryDate: expiry,
-  //     };
-  //   } catch (error) {
-  //     console.error("Error in uploadPrescription:", error);
-  //     throw error;
-  //   }
-  // }
-
-  ////////////////correct one ///////////////////////////
+  
 
   static async uploadPrescription(customerId, data) {
     try {

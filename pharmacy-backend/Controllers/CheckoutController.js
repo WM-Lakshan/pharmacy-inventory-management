@@ -887,49 +887,8 @@ class CheckoutController {
       connection.release();
     }
   }
-//   static async getPrescriptionProducts(req, res) {
-//   try {
-//     const prescriptionId = req.params.id;
-//     const customerId = req.user.id;
 
-//     // Verify prescription belongs to customer
-//     const [prescriptions] = await db.execute(
-//       `SELECT p.prescription_id 
-//        FROM prescription p
-//        WHERE p.prescription_id = ? AND p.customer_id = ?`,
-//       [prescriptionId, customerId]
-//     );
 
-//     if (prescriptions.length === 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Prescription not found",
-//       });
-//     }
-
-//     // Get prescription products
-//     const [products] = await db.execute(
-//       `SELECT pp.product_id, p.pname as name, pp.quantity, p.price, p.image
-//        FROM prescription_product pp
-//        JOIN product p ON pp.product_id = p.product_id
-//        WHERE pp.prescription_id = ?`,
-//       [prescriptionId]
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       products,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching prescription products:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch prescription products",
-//     });
-//   }
-// }
-
-// Add this method to your existing CheckoutController.js
 /**
  * Get products associated with a prescription
  */

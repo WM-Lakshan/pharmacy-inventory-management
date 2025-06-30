@@ -251,77 +251,12 @@ const Dashboard = () => {
               <Text className="text-gray-500">Quantity in Hand</Text>
             </div>
 
-            {/* <div className="flex flex-col items-center">
-              <div className="bg-purple-100 p-3 rounded-full mb-2">
-                <CheckCircleOutlined className="text-purple-500 text-xl" />
-              </div>
-              <Text className="text-lg font-semibold">
-                {inventory.toBeReceived}
-              </Text>
-              <Text className="text-gray-500">To be received</Text>
-            </div> */}
+            
           </div>
         </Card>
       </div>
 
-      {/* Sales & Purchase Chart */}
-      {/* <Card
-        title="Sales & Purchase"
-        className="mb-6 shadow-md"
-        extra={
-          <div className="flex space-x-2">
-            <Button
-              type={timeRange === "weekly" ? "primary" : "default"}
-              onClick={() => handleTimeRangeChange("weekly")}
-              className={timeRange === "weekly" ? "bg-blue-500" : ""}
-            >
-              Weekly
-            </Button>
-            <Button
-              type={timeRange === "monthly" ? "primary" : "default"}
-              onClick={() => handleTimeRangeChange("monthly")}
-              className={timeRange === "monthly" ? "bg-blue-500" : ""}
-            >
-              Monthly
-            </Button>
-            <Button
-              type={timeRange === "yearly" ? "primary" : "default"}
-              onClick={() => handleTimeRangeChange("yearly")}
-              className={timeRange === "yearly" ? "bg-blue-500" : ""}
-            >
-              Yearly
-            </Button>
-          </div>
-        }
-      >
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={salesData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => `Rs. ${value}`} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="purchase"
-                stroke="#4F46E5"
-                activeDot={{ r: 8 }}
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="sales"
-                stroke="#22C55E"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </Card> */}
+      
 
       {/* Top Products and Status sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -329,11 +264,7 @@ const Dashboard = () => {
         <Card
           title="Top Selling Stock"
           className="shadow-md"
-          // extra={
-          //   <a href="/products" className="text-blue-500">
-          //     See All
-          //   </a>
-          // }
+         
         >
           <Table
             columns={topSellingColumns}

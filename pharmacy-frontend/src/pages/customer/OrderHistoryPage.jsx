@@ -198,7 +198,7 @@ const CustomerOrderHistory = () => {
           <Button
             type="primary"
             className="mt-4 bg-blue-500"
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = "/customer/HomePage")}
           >
             Start Shopping
           </Button>
