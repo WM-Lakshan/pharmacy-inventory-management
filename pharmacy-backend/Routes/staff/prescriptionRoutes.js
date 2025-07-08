@@ -43,33 +43,6 @@ router.post(
   PrescriptionController.cancelPrescription
 );
 
-// Route to check expired prescriptions (can be protected or used by cron job)
-// router.post(
-//   "/prescriptions/check-expired",
-//   authenticate,
-//   PrescriptionController.checkExpiredPrescriptions
-// );
 
-// // Routes for customers
-// router.get(
-//   "/customer/prescriptions",
-//   authenticate,
-//   authorize(["customer"]),
-//   PrescriptionController.getMyPrescriptions
-// );
-
-// router.get(
-//   "/customer/prescriptions/:id",
-//   authenticate,
-//   authorize(["customer"]),
-//   PrescriptionController.getPrescriptionById
-// );
-
-// router.post(
-//   "/customer/prescriptions/upload",
-//   authenticate,
-//   authorize(["customer"]),
-//   PrescriptionController.uploadPrescription
-// );
 
 module.exports = router;

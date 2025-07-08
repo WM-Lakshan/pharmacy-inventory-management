@@ -8,11 +8,7 @@ const CategoriesPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // const token = localStorage.getItem("token");
-    // if (!token) {
-    //   window.location.href = "/login"; // Or useNavigate()
-    //   return;
-    // }
+    
 
     fetchCategories(); // Only runs if token exists
   }, []);
